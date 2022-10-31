@@ -14,11 +14,14 @@ func main() {
 
 	accountController := controllers.AccountController{}
 
-	mainGroup := router.Group("/v1")
+	mainGroup := router.Group("/api/v1")
 	{
 		account := mainGroup.Group("/account")
 		{
 			account.POST("/add", accountController.AddAccount)
+			account.GET("/getById", accountController.GetAccountById)
+			account.POST("/getAll", accountController.GetAccount)
+			account.PUT("/update", accountController.UpdateAccount)
 		}
 	}
 
