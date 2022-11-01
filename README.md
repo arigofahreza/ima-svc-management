@@ -3,6 +3,6 @@
 ## service management account and role for ima reprocess process
 
 ## todo:
-- ## role endpoint
+- ## login logout
 - ## privilege menu
 - ## secure with jwt

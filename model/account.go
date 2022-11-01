@@ -15,8 +15,3 @@ type PaginateAccountModel struct {
 	Page    int    `json:"page,omitempty" bson:"page,omitempty"`
 	Size    int    `json:"size,omitempty" bson:"size,omitempty"`
 }
-
-type RangePage struct {
-	End   int `json:"end,omitempty" bson:"end,omitempty"`
-	Start int `json:"start,omitempty" bson:"start,omitempty"`
-}

@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"ima-svc-management/config"
-	"ima-svc-management/helpers"
 	"ima-svc-management/model"
 	"log"
 	"net/http"
@@ -16,55 +15,52 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type AccountController struct{}
+type RoleController struct{}
 
-func (accountController AccountController) AddAccount(c *gin.Context) {
-
+func (roleController RoleController) AddRole(c *gin.Context) {
 	mongoClient, err := config.InitMongo().Mongo()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := mongoClient.Database("test").Collection("role")
 
-	account := model.AccountModel{}
-	err = c.BindJSON(&account)
+	role := model.RoleModel{}
+	err = c.BindJSON(&role)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
 
-	dataAccount := bson.M{
-		"name":      account.Name,
-		"email":     account.Email,
-		"password":  helpers.GeneratePasswordHash([]byte(account.Password)),
-		"createdAt": time.Now().Unix(),
-		"updatedAt": nil,
+	dataRole := bson.M{
+		"name":        role.Name,
+		"role":        role.Role,
+		"description": role.Description,
+		"createdAt":   time.Now().Unix(),
+		"updatedAt":   nil,
 	}
 
-	hashId, err := bson.Marshal(dataAccount)
+	hashId, err := bson.Marshal(dataRole)
 	if err != nil {
 		log.Fatal(err)
 	}
 	hash := md5.Sum(hashId)
 
-	dataAccount["_id"] = hex.EncodeToString(hash[:])
+	dataRole["_id"] = hex.EncodeToString(hash[:])
 
-	_, err = collection.InsertOne(context.Background(), dataAccount)
+	_, err = collection.InsertOne(context.Background(), dataRole)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Create account successful"})
-
+	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Create role successful"})
 }
 
-func (accountController AccountController) GetAccount(c *gin.Context) {
-
-	paginationModel := model.PaginateAccountModel{}
+func (roleController RoleController) GetRole(c *gin.Context) {
+	paginationModel := model.PaginateRoleModel{}
 
 	err := c.BindJSON(&paginationModel)
 	if err != nil {
@@ -79,7 +75,7 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := mongoClient.Database("test").Collection("role")
 
 	pageOptions := options.Find()
 	pageOptions.SetLimit(int64(paginationModel.Size))
@@ -101,29 +97,28 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 
 	datas := make([]map[string]interface{}, 0)
 	for cursor.Next(context.TODO()) {
-		account := model.AccountModel{}
-		if err := cursor.Decode(&account); err != nil {
+		role := model.RoleModel{}
+		if err := cursor.Decode(&role); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			c.Abort()
 			return
 		}
 		data := map[string]interface{}{
-			"id":         account.Id,
-			"name":       account.Name,
-			"email":      account.Email,
-			"created_at": account.CreatedAt,
-			"updated_at": account.UpdatedAt,
+			"id":          role.Id,
+			"name":        role.Name,
+			"role":        role.Role,
+			"description": role.Description,
+			"created_at":  role.CreatedAt,
+			"updated_at":  role.UpdatedAt,
 		}
 		datas = append(datas, data)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
-
 }
 
-func (accountController AccountController) GetAccountById(c *gin.Context) {
-
-	account := model.AccountModel{}
+func (roleController RoleController) GetRoleById(c *gin.Context) {
+	role := model.RoleModel{}
 
 	id := c.Query("id")
 
@@ -133,11 +128,11 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := mongoClient.Database("test").Collection("role")
 
 	filter := bson.M{"_id": id}
 
-	err = collection.FindOne(context.TODO(), filter).Decode(&account)
+	err = collection.FindOne(context.TODO(), filter).Decode(&role)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -146,18 +141,19 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 
 	datas := make([]map[string]interface{}, 0)
 	data := map[string]interface{}{
-		"id":         account.Id,
-		"name":       account.Name,
-		"email":      account.Email,
-		"created_at": account.CreatedAt,
-		"updated_at": account.UpdatedAt,
+		"id":          role.Id,
+		"name":        role.Name,
+		"role":        role.Role,
+		"description": role.Description,
+		"created_at":  role.CreatedAt,
+		"updated_at":  role.UpdatedAt,
 	}
 	datas = append(datas, data)
 
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
 }
 
-func (accountController AccountController) UpdateAccount(c *gin.Context) {
+func (roleController RoleController) UpdateRole(c *gin.Context) {
 
 	mongoClient, err := config.InitMongo().Mongo()
 	if err != nil {
@@ -165,30 +161,30 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := mongoClient.Database("test").Collection("role")
 
-	account := model.AccountModel{}
-	err = c.BindJSON(&account)
+	role := model.RoleModel{}
+	err = c.BindJSON(&role)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
 
-	filter := bson.M{"_id": account.Id}
-	updateAccount := bson.M{
+	filter := bson.M{"_id": role.Id}
+	updateRole := bson.M{
 		"updatedAt": time.Now().Unix(),
 	}
-	if account.Email != "" {
-		updateAccount["email"] = account.Email
+	if role.Description != "" {
+		updateRole["description"] = role.Description
 	}
-	if account.Name != "" {
-		updateAccount["name"] = account.Name
+	if role.Name != "" {
+		updateRole["name"] = role.Name
 	}
-	if account.Password != "" {
-		updateAccount["password"] = helpers.GeneratePasswordHash([]byte(account.Password))
+	if role.Role != ""{
+		updateRole["role"] = role.Role
 	}
-	update := bson.M{"$set": updateAccount}
+	update := bson.M{"$set": updateRole}
 
 	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
@@ -196,11 +192,11 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Update account successful"})
+	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Update role successful"})
 
 }
 
-func (accountController AccountController) DeleteAccount(c *gin.Context) {
+func (roleController RoleController) DeleteRole(c *gin.Context) {
 	id := c.Query("id")
 	mongoClient, err := config.InitMongo().Mongo()
 	if err != nil {
@@ -208,7 +204,7 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := mongoClient.Database("test").Collection("role")
 
 	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
@@ -216,6 +212,5 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Delete account successful"})
-
+	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Delete role successful"})
 }
