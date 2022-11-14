@@ -2,10 +2,8 @@ package main
 
 import (
 	"ima-svc-management/controllers"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/sessions"
 )
 
 func main() {
@@ -16,6 +14,7 @@ func main() {
 
 	accountController := controllers.AccountController{}
 	roleController := controllers.RoleController{}
+	authController := controllers.AuthController{}
 
 	mainGroup := router.Group("/api/v1")
 	{
@@ -35,6 +34,12 @@ func main() {
 			role.POST("/getAll", roleController.GetRole)
 			role.PUT("/update", roleController.UpdateRole)
 			role.DELETE("/delete", roleController.DeleteRole)
+		}
+
+		auth := mainGroup.Group("/auth")
+		{
+			auth.POST("/login", authController.Login)
+			auth.POST("/logout", authController.Logout)
 		}
 	}
 
@@ -58,14 +63,14 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
-func AuthRequired(c *gin.Context) {
-	session := sessions.Default(c)
-	user := session.Get("userkey")
-	if user == nil {
-		// Abort the request with the appropriate error code
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-	// Continue down the chain to handler etc
-	c.Next()
-}
+// func AuthRequired(c *gin.Context) {
+// 	session := sessions.Default(c)
+// 	user := session.Get("userkey")
+// 	if user == nil {
+// 		// Abort the request with the appropriate error code
+// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+// 		return
+// 	}
+// 	// Continue down the chain to handler etc
+// 	c.Next()
+// }

@@ -13,6 +13,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -218,4 +219,29 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Delete account successful"})
 
+}
+
+func (accountController AccountController) CheckEmail(c *gin.Context) {
+	account := model.AccountModel{}
+
+	id := c.Query("email")
+
+	mongoClient, err := config.InitMongo().Mongo()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.Abort()
+		return
+	}
+	collection := mongoClient.Database("test").Collection("account")
+
+	filter := bson.M{"email": id}
+
+	err = collection.FindOne(context.TODO(), filter).Decode(&account)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Email Available"})
+		}
+	}else{
+		c.JSON(http.StatusForbidden, gin.H{"status": "OK", "message": "Email Not Available"})
+	}
 }
