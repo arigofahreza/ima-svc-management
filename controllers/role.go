@@ -17,6 +17,14 @@ import (
 
 type RoleController struct{}
 
+// @Summary Add role
+// @Description create new role
+// @Param body body model.RoleModel true "body"
+// @Tags Role
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/role/add [post]
 func (roleController RoleController) AddRole(c *gin.Context) {
 	mongoClient, err := config.InitMongo().Mongo()
 	if err != nil {
@@ -59,6 +67,14 @@ func (roleController RoleController) AddRole(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Create role successful"})
 }
 
+// @Summary Get all role
+// @Description get all role with pagination
+// @Param body body model.PaginateRoleModel true "body"
+// @Tags Role
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,datas=[]model.RoleModel} "ok"
+// @Router /api/v1/role/getAll [post]
 func (roleController RoleController) GetRole(c *gin.Context) {
 	paginationModel := model.PaginateRoleModel{}
 
@@ -108,8 +124,8 @@ func (roleController RoleController) GetRole(c *gin.Context) {
 			"name":        role.Name,
 			"role":        role.Role,
 			"description": role.Description,
-			"created_at":  role.CreatedAt,
-			"updated_at":  role.UpdatedAt,
+			"createdAt":   role.CreatedAt,
+			"updatedAt":   role.UpdatedAt,
 		}
 		datas = append(datas, data)
 	}
@@ -117,6 +133,14 @@ func (roleController RoleController) GetRole(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
 }
 
+// @Summary Get role by id
+// @Description get role using id
+// @Param id query string true "id"
+// @Tags Role
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,datas=[]model.RoleModel} "ok"
+// @Router /api/v1/role/getById [get]
 func (roleController RoleController) GetRoleById(c *gin.Context) {
 	role := model.RoleModel{}
 
@@ -145,14 +169,22 @@ func (roleController RoleController) GetRoleById(c *gin.Context) {
 		"name":        role.Name,
 		"role":        role.Role,
 		"description": role.Description,
-		"created_at":  role.CreatedAt,
-		"updated_at":  role.UpdatedAt,
+		"createdAt":   role.CreatedAt,
+		"updatedAt":   role.UpdatedAt,
 	}
 	datas = append(datas, data)
 
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
 }
 
+// @Summary Update role
+// @Description Update role
+// @Param body body model.RoleModel true "body"
+// @Tags Role
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/role/update [put]
 func (roleController RoleController) UpdateRole(c *gin.Context) {
 
 	mongoClient, err := config.InitMongo().Mongo()
@@ -181,7 +213,7 @@ func (roleController RoleController) UpdateRole(c *gin.Context) {
 	if role.Name != "" {
 		updateRole["name"] = role.Name
 	}
-	if role.Role != ""{
+	if role.Role != "" {
 		updateRole["role"] = role.Role
 	}
 	update := bson.M{"$set": updateRole}
@@ -196,6 +228,14 @@ func (roleController RoleController) UpdateRole(c *gin.Context) {
 
 }
 
+// @Summary Delete role by id
+// @Description delete role using id
+// @Param id query string true "id"
+// @Tags Role
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/role/delete [delete]
 func (roleController RoleController) DeleteRole(c *gin.Context) {
 	id := c.Query("id")
 	mongoClient, err := config.InitMongo().Mongo()

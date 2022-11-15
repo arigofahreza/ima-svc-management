@@ -17,6 +17,15 @@ var REFRESH_TOKEN = time.Duration(10) * time.Minute
 
 type AuthController struct{}
 
+// @Summary Login
+// @Description Login user
+// @Param email formData string true "email"
+// @Param password formData string true "password"
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/auth/login [post]
 func (authController AuthController) Login(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
@@ -92,6 +101,13 @@ func (authController AuthController) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Login Success"})
 }
 
+// @Summary Logout
+// @Description Logout user
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/auth/logout [post]
 func (authController AuthController) Logout(c *gin.Context) {
 	token := c.GetHeader("Token")
 

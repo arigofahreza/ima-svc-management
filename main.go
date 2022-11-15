@@ -2,16 +2,25 @@ package main
 
 import (
 	"ima-svc-management/controllers"
+	docs "ima-svc-management/docs"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 )
+
+// @title IMA Reprocess Management API
+// @version 1.0
+// @description API for management account and role IMA Reprocess Project
+
 
 func main() {
 
 	router := gin.Default()
 	router.Use(gin.Logger())
 	router.Use(CORSMiddleware())
-
+	docs.SwaggerInfo.BasePath = "/"
 	accountController := controllers.AccountController{}
 	roleController := controllers.RoleController{}
 	authController := controllers.AuthController{}
@@ -25,6 +34,7 @@ func main() {
 			account.POST("/getAll", accountController.GetAccount)
 			account.PUT("/update", accountController.UpdateAccount)
 			account.DELETE("/delete", accountController.DeleteAccount)
+			account.GET("/checkEmail", accountController.CheckEmail)
 		}
 
 		role := mainGroup.Group("/role")
@@ -42,7 +52,7 @@ func main() {
 			auth.POST("/logout", authController.Logout)
 		}
 	}
-
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	router.Run(":8000")
 
 }
@@ -63,14 +73,3 @@ func CORSMiddleware() gin.HandlerFunc {
 	}
 }
 
-// func AuthRequired(c *gin.Context) {
-// 	session := sessions.Default(c)
-// 	user := session.Get("userkey")
-// 	if user == nil {
-// 		// Abort the request with the appropriate error code
-// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-// 		return
-// 	}
-// 	// Continue down the chain to handler etc
-// 	c.Next()
-// }

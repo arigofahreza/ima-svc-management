@@ -1,0 +1,426 @@
+definitions:
+  model.AccountModel:
+    properties:
+      _id:
+        type: string
+      createdAt:
+        type: integer
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      updatedAt:
+        type: integer
+    type: object
+  model.PaginateRoleModel:
+    properties:
+      order:
+        type: string
+      orderBy:
+        type: string
+      page:
+        type: integer
+      size:
+        type: integer
+    type: object
+  model.RoleModel:
+    properties:
+      _id:
+        type: string
+      createdAt:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      role:
+        type: string
+      updatedAt:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: API for management account and role IMA Reprocess Project
+  title: IMA Reprocess Management API
+  version: "1.0"
+paths:
+  /api/v1/account/add:
+    post:
+      consumes:
+      - application/json
+      description: create new account
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.AccountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Add account
+      tags:
+      - Account
+  /api/v1/account/checkEmail:
+    get:
+      consumes:
+      - application/json
+      description: check email availability
+      parameters:
+      - description: email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Check email
+      tags:
+      - Account
+  /api/v1/account/delete:
+    delete:
+      consumes:
+      - application/json
+      description: delete account using id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Delete account by id
+      tags:
+      - Account
+  /api/v1/account/getAll:
+    post:
+      consumes:
+      - application/json
+      description: get all account with pagination
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.PaginateRoleModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                datas:
+                  items:
+                    $ref: '#/definitions/model.AccountModel'
+                  type: array
+                status:
+                  type: string
+              type: object
+      summary: Get all account
+      tags:
+      - Account
+  /api/v1/account/getById:
+    get:
+      consumes:
+      - application/json
+      description: get account using id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                datas:
+                  items:
+                    $ref: '#/definitions/model.AccountModel'
+                  type: array
+                status:
+                  type: string
+              type: object
+      summary: Get account by id
+      tags:
+      - Account
+  /api/v1/account/update:
+    put:
+      consumes:
+      - application/json
+      description: Update account
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.AccountModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Update account
+      tags:
+      - Account
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      parameters:
+      - description: email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: password
+        in: formData
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Login
+      tags:
+      - Auth
+  /api/v1/auth/logout:
+    post:
+      consumes:
+      - application/json
+      description: Logout user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Logout
+      tags:
+      - Auth
+  /api/v1/role/add:
+    post:
+      consumes:
+      - application/json
+      description: create new role
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.RoleModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Add role
+      tags:
+      - Role
+  /api/v1/role/delete:
+    delete:
+      consumes:
+      - application/json
+      description: delete role using id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Delete role by id
+      tags:
+      - Role
+  /api/v1/role/getAll:
+    post:
+      consumes:
+      - application/json
+      description: get all role with pagination
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.PaginateRoleModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                datas:
+                  items:
+                    $ref: '#/definitions/model.RoleModel'
+                  type: array
+                status:
+                  type: string
+              type: object
+      summary: Get all role
+      tags:
+      - Role
+  /api/v1/role/getById:
+    get:
+      consumes:
+      - application/json
+      description: get role using id
+      parameters:
+      - description: id
+        in: query
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                datas:
+                  items:
+                    $ref: '#/definitions/model.RoleModel'
+                  type: array
+                status:
+                  type: string
+              type: object
+      summary: Get role by id
+      tags:
+      - Role
+  /api/v1/role/update:
+    put:
+      consumes:
+      - application/json
+      description: Update role
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.RoleModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            allOf:
+            - type: object
+            - properties:
+                message:
+                  type: string
+                status:
+                  type: string
+              type: object
+      summary: Update role
+      tags:
+      - Role
+swagger: "2.0"

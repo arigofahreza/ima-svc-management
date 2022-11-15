@@ -19,6 +19,14 @@ import (
 
 type AccountController struct{}
 
+// @Summary Add account
+// @Description create new account
+// @Param body body model.AccountModel true "body"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/account/add [post]
 func (accountController AccountController) AddAccount(c *gin.Context) {
 
 	mongoClient, err := config.InitMongo().Mongo()
@@ -63,6 +71,14 @@ func (accountController AccountController) AddAccount(c *gin.Context) {
 
 }
 
+// @Summary Get all account
+// @Description get all account with pagination
+// @Param body body model.PaginateRoleModel true "body"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
+// @Router /api/v1/account/getAll [post]
 func (accountController AccountController) GetAccount(c *gin.Context) {
 
 	paginationModel := model.PaginateAccountModel{}
@@ -122,6 +138,14 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 
 }
 
+// @Summary Get account by id
+// @Description get account using id
+// @Param id query string true "id"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
+// @Router /api/v1/account/getById [get]
 func (accountController AccountController) GetAccountById(c *gin.Context) {
 
 	account := model.AccountModel{}
@@ -158,6 +182,14 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
 }
 
+// @Summary Update account
+// @Description Update account
+// @Param body body model.AccountModel true "body"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/account/update [put]
 func (accountController AccountController) UpdateAccount(c *gin.Context) {
 
 	mongoClient, err := config.InitMongo().Mongo()
@@ -201,6 +233,14 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 
 }
 
+// @Summary Delete account by id
+// @Description delete account using id
+// @Param id query string true "id"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/account/delete [delete]
 func (accountController AccountController) DeleteAccount(c *gin.Context) {
 	id := c.Query("id")
 	mongoClient, err := config.InitMongo().Mongo()
@@ -221,6 +261,14 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 
 }
 
+// @Summary Check email
+// @Description check email availability
+// @Param email query string true "email"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,message=string} "ok"
+// @Router /api/v1/account/checkEmail [get]
 func (accountController AccountController) CheckEmail(c *gin.Context) {
 	account := model.AccountModel{}
 
