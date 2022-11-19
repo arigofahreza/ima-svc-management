@@ -12,10 +12,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type RoleController struct{}
+type RoleController struct {
+	MongoClient *mongo.Client
+}
+
+func InitRole() *AuthController {
+	mongoClient, err := config.InitMongo().Mongo()
+	if err != nil {
+		return nil
+	}
+	return &AuthController{
+		MongoClient: mongoClient,
+	}
+}
 
 // @Summary Add role
 // @Description create new role
@@ -26,16 +39,10 @@ type RoleController struct{}
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/role/add [post]
 func (roleController RoleController) AddRole(c *gin.Context) {
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("role")
+	collection := roleController.MongoClient.Database("test").Collection("role")
 
 	role := model.RoleModel{}
-	err = c.BindJSON(&role)
+	err := c.BindJSON(&role)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -85,13 +92,7 @@ func (roleController RoleController) GetRole(c *gin.Context) {
 		return
 	}
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("role")
+	collection := roleController.MongoClient.Database("test").Collection("role")
 
 	pageOptions := options.Find()
 	pageOptions.SetLimit(int64(paginationModel.Size))
@@ -146,17 +147,11 @@ func (roleController RoleController) GetRoleById(c *gin.Context) {
 
 	id := c.Query("id")
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("role")
+	collection := roleController.MongoClient.Database("test").Collection("role")
 
 	filter := bson.M{"_id": id}
 
-	err = collection.FindOne(context.TODO(), filter).Decode(&role)
+	err := collection.FindOne(context.TODO(), filter).Decode(&role)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -187,16 +182,10 @@ func (roleController RoleController) GetRoleById(c *gin.Context) {
 // @Router /api/v1/role/update [put]
 func (roleController RoleController) UpdateRole(c *gin.Context) {
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("role")
+	collection := roleController.MongoClient.Database("test").Collection("role")
 
 	role := model.RoleModel{}
-	err = c.BindJSON(&role)
+	err := c.BindJSON(&role)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -238,15 +227,10 @@ func (roleController RoleController) UpdateRole(c *gin.Context) {
 // @Router /api/v1/role/delete [delete]
 func (roleController RoleController) DeleteRole(c *gin.Context) {
 	id := c.Query("id")
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("role")
+	
+	collection := roleController.MongoClient.Database("test").Collection("role")
 
-	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": id})
+	_, err := collection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()

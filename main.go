@@ -21,7 +21,7 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(CORSMiddleware())
 	docs.SwaggerInfo.BasePath = "/"
-	accountController := controllers.AccountController{}
+	accountController := controllers.InitAccount()
 	roleController := controllers.RoleController{}
 	authController := controllers.AuthController{}
 

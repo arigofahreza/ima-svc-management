@@ -9,13 +9,34 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var ACCESS_TOKEN = time.Duration(5) * time.Minute
 var REFRESH_TOKEN = time.Duration(10) * time.Minute
 
-type AuthController struct{}
+type AuthController struct {
+	MongoClient *mongo.Client
+	RedisClient *redis.Client
+}
+
+func InitAuth() *AuthController {
+	mongoClient, err := config.InitMongo().Mongo()
+	if err != nil {
+		return nil
+	}
+	redisClient, err := config.InitRedis().Redis()
+	if err != nil {
+		return nil
+	}
+	return &AuthController{
+		MongoClient: mongoClient,
+		RedisClient: redisClient,
+	}
+
+}
 
 // @Summary Login
 // @Description Login user
@@ -30,26 +51,13 @@ func (authController AuthController) Login(c *gin.Context) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	redisClient, err := config.InitRedis().Redis()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := authController.MongoClient.Database("test").Collection("account")
 
 	filter := bson.M{"email": email}
 
 	account := model.AccountModel{}
 
-	err = collection.FindOne(context.TODO(), filter).Decode(&account)
+	err := collection.FindOne(context.TODO(), filter).Decode(&account)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -76,15 +84,15 @@ func (authController AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	getToken, err := redisClient.Get(context.Background(), accessToken).Result()
+	getToken, err := authController.RedisClient.Get(context.Background(), accessToken).Result()
 	if getToken == "" {
-		setAccessToken := redisClient.Set(context.Background(), accessToken, "", ACCESS_TOKEN)
+		setAccessToken := authController.RedisClient.Set(context.Background(), accessToken, "", ACCESS_TOKEN)
 		if err := setAccessToken.Err(); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			c.Abort()
 			return
 		}
-		setRefreshToken := redisClient.Set(context.Background(), refreshToken, "", REFRESH_TOKEN)
+		setRefreshToken := authController.RedisClient.Set(context.Background(), refreshToken, "", REFRESH_TOKEN)
 		if err := setRefreshToken.Err(); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			c.Abort()
@@ -111,14 +119,7 @@ func (authController AuthController) Login(c *gin.Context) {
 func (authController AuthController) Logout(c *gin.Context) {
 	token := c.GetHeader("Token")
 
-	redisClient, err := config.InitRedis().Redis()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-
-	redisClient.Del(context.Background(), token)
+	authController.RedisClient.Del(context.Background(), token)
 
 	c.Header("Token", "")
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Logout Success"})

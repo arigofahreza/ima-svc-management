@@ -17,7 +17,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-type AccountController struct{}
+type AccountController struct {
+	MongoClient *mongo.Client
+}
+
+func InitAccount() *AccountController {
+	mongoClient, err := config.InitMongo().Mongo()
+	if err != nil {
+		return nil
+	}
+	return &AccountController{
+		MongoClient: mongoClient,
+	}
+}
 
 // @Summary Add account
 // @Description create new account
@@ -29,16 +41,10 @@ type AccountController struct{}
 // @Router /api/v1/account/add [post]
 func (accountController AccountController) AddAccount(c *gin.Context) {
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := accountController.MongoClient.Database("test").Collection("account")
 
 	account := model.AccountModel{}
-	err = c.BindJSON(&account)
+	err := c.BindJSON(&account)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -89,14 +95,7 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 		c.Abort()
 		return
 	}
-
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := accountController.MongoClient.Database("test").Collection("account")
 
 	pageOptions := options.Find()
 	pageOptions.SetLimit(int64(paginationModel.Size))
@@ -152,17 +151,11 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 
 	id := c.Query("id")
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := accountController.MongoClient.Database("test").Collection("account")
 
 	filter := bson.M{"_id": id}
 
-	err = collection.FindOne(context.TODO(), filter).Decode(&account)
+	err := collection.FindOne(context.TODO(), filter).Decode(&account)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -192,16 +185,10 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 // @Router /api/v1/account/update [put]
 func (accountController AccountController) UpdateAccount(c *gin.Context) {
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := accountController.MongoClient.Database("test").Collection("account")
 
 	account := model.AccountModel{}
-	err = c.BindJSON(&account)
+	err := c.BindJSON(&account)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -243,15 +230,9 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 // @Router /api/v1/account/delete [delete]
 func (accountController AccountController) DeleteAccount(c *gin.Context) {
 	id := c.Query("id")
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := accountController.MongoClient.Database("test").Collection("account")
 
-	_, err = collection.DeleteOne(context.Background(), bson.M{"_id": id})
+	_, err := collection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
@@ -274,22 +255,16 @@ func (accountController AccountController) CheckEmail(c *gin.Context) {
 
 	id := c.Query("email")
 
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
-	collection := mongoClient.Database("test").Collection("account")
+	collection := accountController.MongoClient.Database("test").Collection("account")
 
 	filter := bson.M{"email": id}
 
-	err = collection.FindOne(context.TODO(), filter).Decode(&account)
+	err := collection.FindOne(context.TODO(), filter).Decode(&account)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Email Available"})
 		}
-	}else{
+	} else {
 		c.JSON(http.StatusForbidden, gin.H{"status": "OK", "message": "Email Not Available"})
 	}
 }
