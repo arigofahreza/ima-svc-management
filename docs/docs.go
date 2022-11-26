@@ -18,6 +18,11 @@ const docTemplate = `{
     "paths": {
         "/api/v1/account/add": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "create new account",
                 "consumes": [
                     "application/json"
@@ -67,6 +72,11 @@ const docTemplate = `{
         },
         "/api/v1/account/checkEmail": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "check email availability",
                 "consumes": [
                     "application/json"
@@ -114,6 +124,11 @@ const docTemplate = `{
         },
         "/api/v1/account/delete": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "delete account using id",
                 "consumes": [
                     "application/json"
@@ -161,6 +176,11 @@ const docTemplate = `{
         },
         "/api/v1/account/getAll": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get all account with pagination",
                 "consumes": [
                     "application/json"
@@ -213,6 +233,11 @@ const docTemplate = `{
         },
         "/api/v1/account/getById": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get account using id",
                 "consumes": [
                     "application/json"
@@ -263,6 +288,11 @@ const docTemplate = `{
         },
         "/api/v1/account/update": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update account",
                 "consumes": [
                     "application/json"
@@ -404,6 +434,11 @@ const docTemplate = `{
         },
         "/api/v1/role/add": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "create new role",
                 "consumes": [
                     "application/json"
@@ -453,6 +488,11 @@ const docTemplate = `{
         },
         "/api/v1/role/delete": {
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "delete role using id",
                 "consumes": [
                     "application/json"
@@ -500,6 +540,11 @@ const docTemplate = `{
         },
         "/api/v1/role/getAll": {
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get all role with pagination",
                 "consumes": [
                     "application/json"
@@ -552,6 +597,11 @@ const docTemplate = `{
         },
         "/api/v1/role/getById": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "get role using id",
                 "consumes": [
                     "application/json"
@@ -602,6 +652,11 @@ const docTemplate = `{
         },
         "/api/v1/role/update": {
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Update role",
                 "consumes": [
                     "application/json"
@@ -669,6 +724,9 @@ const docTemplate = `{
                 "password": {
                     "type": "string"
                 },
+                "role": {
+                    "type": "string"
+                },
                 "updatedAt": {
                     "type": "integer"
                 }
@@ -713,6 +771,13 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`

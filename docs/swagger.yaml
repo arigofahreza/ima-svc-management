@@ -11,6 +11,8 @@ definitions:
         type: string
       password:
         type: string
+      role:
+        type: string
       updatedAt:
         type: integer
     type: object
@@ -72,6 +74,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Add account
       tags:
       - Account
@@ -100,6 +104,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Check email
       tags:
       - Account
@@ -128,6 +134,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete account by id
       tags:
       - Account
@@ -159,6 +167,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all account
       tags:
       - Account
@@ -189,6 +199,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get account by id
       tags:
       - Account
@@ -218,6 +230,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update account
       tags:
       - Account
@@ -302,6 +316,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Add role
       tags:
       - Role
@@ -330,6 +346,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Delete role by id
       tags:
       - Role
@@ -361,6 +379,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get all role
       tags:
       - Role
@@ -391,6 +411,8 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Get role by id
       tags:
       - Role
@@ -420,7 +442,14 @@ paths:
                 status:
                   type: string
               type: object
+      security:
+      - ApiKeyAuth: []
       summary: Update role
       tags:
       - Role
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

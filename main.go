@@ -7,13 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-
 )
 
 // @title IMA Reprocess Management API
 // @version 1.0
 // @description API for management account and role IMA Reprocess Project
-
+// @securityDefinitions.apiKey BearerAuth
+// @in header
+// @name Authorization
 
 func main() {
 
@@ -22,8 +23,8 @@ func main() {
 	router.Use(CORSMiddleware())
 	docs.SwaggerInfo.BasePath = "/"
 	accountController := controllers.InitAccount()
-	roleController := controllers.RoleController{}
-	authController := controllers.AuthController{}
+	roleController := controllers.InitRole()
+	authController := controllers.InitAuth()
 
 	mainGroup := router.Group("/api/v1")
 	{
@@ -72,4 +73,3 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
-

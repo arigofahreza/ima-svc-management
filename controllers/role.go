@@ -20,12 +20,12 @@ type RoleController struct {
 	MongoClient *mongo.Client
 }
 
-func InitRole() *AuthController {
+func InitRole() *RoleController {
 	mongoClient, err := config.InitMongo().Mongo()
 	if err != nil {
 		return nil
 	}
-	return &AuthController{
+	return &RoleController{
 		MongoClient: mongoClient,
 	}
 }
@@ -38,6 +38,7 @@ func InitRole() *AuthController {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/role/add [post]
+// @Security ApiKeyAuth
 func (roleController RoleController) AddRole(c *gin.Context) {
 	collection := roleController.MongoClient.Database("test").Collection("role")
 
@@ -82,6 +83,7 @@ func (roleController RoleController) AddRole(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,datas=[]model.RoleModel} "ok"
 // @Router /api/v1/role/getAll [post]
+// @Security ApiKeyAuth
 func (roleController RoleController) GetRole(c *gin.Context) {
 	paginationModel := model.PaginateRoleModel{}
 
@@ -142,6 +144,7 @@ func (roleController RoleController) GetRole(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,datas=[]model.RoleModel} "ok"
 // @Router /api/v1/role/getById [get]
+// @Security ApiKeyAuth
 func (roleController RoleController) GetRoleById(c *gin.Context) {
 	role := model.RoleModel{}
 
@@ -180,6 +183,7 @@ func (roleController RoleController) GetRoleById(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/role/update [put]
+// @Security ApiKeyAuth
 func (roleController RoleController) UpdateRole(c *gin.Context) {
 
 	collection := roleController.MongoClient.Database("test").Collection("role")
@@ -225,9 +229,10 @@ func (roleController RoleController) UpdateRole(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/role/delete [delete]
+// @Security ApiKeyAuth
 func (roleController RoleController) DeleteRole(c *gin.Context) {
 	id := c.Query("id")
-	
+
 	collection := roleController.MongoClient.Database("test").Collection("role")
 
 	_, err := collection.DeleteOne(context.Background(), bson.M{"_id": id})

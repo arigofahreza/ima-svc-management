@@ -4,6 +4,7 @@ type AccountModel struct {
 	Id        string `json:"_id,omitempty" bson:"_id,omitempty"`
 	Name      string `json:"name,omitempty" bson:"name,omitempty"`
 	Email     string `json:"email,omitempty" bson:"email,omitempty"`
+	Role      string `json:"role,omitempty" bson:"role,omitempty"`
 	Password  string `json:"password,omitempty" bson:"password,omitempty"`
 	CreatedAt int64  `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
 	UpdatedAt int64  `json:"updatedAt,omitempty" bson:"updatedAt,omitempty"`

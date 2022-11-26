@@ -29,6 +29,7 @@ func PasswordCompare(password []byte, hashedPassword []byte) (bool, error) {
 	return true, nil
 }
 
+// TODO change logic jwt
 func GenerateToken(param string) (string, error) {
 	key := []byte(param)
 	claims := &jwt.RegisteredClaims{

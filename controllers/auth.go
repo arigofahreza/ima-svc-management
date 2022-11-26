@@ -104,7 +104,7 @@ func (authController AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	c.Header("Token", getToken)
+	c.Header("Authorization", "Bearer " + getToken)
 
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Login Success"})
 }

@@ -39,6 +39,7 @@ func InitAccount() *AccountController {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/add [post]
+// @Security ApiKeyAuth
 func (accountController AccountController) AddAccount(c *gin.Context) {
 
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -55,6 +56,7 @@ func (accountController AccountController) AddAccount(c *gin.Context) {
 		"name":      account.Name,
 		"email":     account.Email,
 		"password":  helpers.GeneratePasswordHash([]byte(account.Password)),
+		"role":      account.Role,
 		"createdAt": time.Now().Unix(),
 		"updatedAt": nil,
 	}
@@ -85,6 +87,7 @@ func (accountController AccountController) AddAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
 // @Router /api/v1/account/getAll [post]
+// @Security ApiKeyAuth
 func (accountController AccountController) GetAccount(c *gin.Context) {
 
 	paginationModel := model.PaginateAccountModel{}
@@ -127,6 +130,7 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 			"id":         account.Id,
 			"name":       account.Name,
 			"email":      account.Email,
+			"role":       account.Role,
 			"created_at": account.CreatedAt,
 			"updated_at": account.UpdatedAt,
 		}
@@ -145,6 +149,7 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
 // @Router /api/v1/account/getById [get]
+// @Security ApiKeyAuth
 func (accountController AccountController) GetAccountById(c *gin.Context) {
 
 	account := model.AccountModel{}
@@ -167,6 +172,7 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 		"id":         account.Id,
 		"name":       account.Name,
 		"email":      account.Email,
+		"role":       account.Role,
 		"created_at": account.CreatedAt,
 		"updated_at": account.UpdatedAt,
 	}
@@ -183,6 +189,7 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/update [put]
+// @Security ApiKeyAuth
 func (accountController AccountController) UpdateAccount(c *gin.Context) {
 
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -208,6 +215,9 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 	if account.Password != "" {
 		updateAccount["password"] = helpers.GeneratePasswordHash([]byte(account.Password))
 	}
+	if account.Role != "" {
+		updateAccount["role"] = account.Role
+	}
 	update := bson.M{"$set": updateAccount}
 
 	_, err = collection.UpdateOne(context.Background(), filter, update)
@@ -228,6 +238,7 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/delete [delete]
+// @Security ApiKeyAuth
 func (accountController AccountController) DeleteAccount(c *gin.Context) {
 	id := c.Query("id")
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -250,6 +261,7 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/checkEmail [get]
+// @Security ApiKeyAuth
 func (accountController AccountController) CheckEmail(c *gin.Context) {
 	account := model.AccountModel{}
 
