@@ -39,7 +39,7 @@ func InitAccount() *AccountController {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/add [post]
-// @Security ApiKeyAuth
+// @Security BearerAuth
 func (accountController AccountController) AddAccount(c *gin.Context) {
 
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -87,7 +87,7 @@ func (accountController AccountController) AddAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
 // @Router /api/v1/account/getAll [post]
-// @Security ApiKeyAuth
+// @Security BearerAuth
 func (accountController AccountController) GetAccount(c *gin.Context) {
 
 	paginationModel := model.PaginateAccountModel{}
@@ -149,7 +149,7 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
 // @Router /api/v1/account/getById [get]
-// @Security ApiKeyAuth
+// @Security BearerAuth
 func (accountController AccountController) GetAccountById(c *gin.Context) {
 
 	account := model.AccountModel{}
@@ -189,7 +189,7 @@ func (accountController AccountController) GetAccountById(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/update [put]
-// @Security ApiKeyAuth
+// @Security BearerAuth
 func (accountController AccountController) UpdateAccount(c *gin.Context) {
 
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -238,7 +238,7 @@ func (accountController AccountController) UpdateAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/delete [delete]
-// @Security ApiKeyAuth
+// @Security BearerAuth
 func (accountController AccountController) DeleteAccount(c *gin.Context) {
 	id := c.Query("id")
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -261,7 +261,7 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/checkEmail [get]
-// @Security ApiKeyAuth
+// @Security BearerAuth
 func (accountController AccountController) CheckEmail(c *gin.Context) {
 	account := model.AccountModel{}
 
