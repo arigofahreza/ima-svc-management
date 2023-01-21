@@ -11,5 +11,5 @@ RUN go build -mod=vendor -v -o ima-svc-management
 FROM alpine:latest AS runner
 WORKDIR /app
 COPY --from=builder . ima-svc-management
-EXPOSE 76331
+EXPOSE 61123
 ENTRYPOINT ["./ima-svc-management"]
