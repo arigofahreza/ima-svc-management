@@ -8,32 +8,22 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type RedisConfig struct {
-	Host     string
-	Port     string
-	Db       string
-}
+var RedisClient *redis.Client
 
-func InitRedis() *RedisConfig {
+func Redis() error {
 	err := godotenv.Load(".env")
 	if err != nil {
-		return nil
+		return err
 	}
-	return &RedisConfig{
-		Host:     os.Getenv("REDIS_HOST"),
-		Port:     os.Getenv("REDIS_PORT"),
-		Db:       os.Getenv("REDIS_DB"),
-	}
-}
-
-func (redisConfig RedisConfig) Redis() (*redis.Client, error) {
-	intPort, err := strconv.Atoi(redisConfig.Db)
+	intPort, err := strconv.Atoi(os.Getenv("REDIS_DB"))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	client := redis.NewClient(&redis.Options{
-		Addr:     redisConfig.Host + ":" + redisConfig.Port,
-		DB:       intPort,
+		Addr: os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
+		DB:   intPort,
 	})
-	return client, nil
+	defer client.Close()
+	RedisClient = client
+	return nil
 }

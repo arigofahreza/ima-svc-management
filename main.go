@@ -1,6 +1,7 @@
 package main
 
 import (
+	"ima-svc-management/config"
 	"ima-svc-management/controllers"
 	docs "ima-svc-management/docs"
 
@@ -22,9 +23,17 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(CORSMiddleware())
 	docs.SwaggerInfo.BasePath = "/"
-	accountController := controllers.InitAccount()
-	roleController := controllers.InitRole()
-	authController := controllers.InitAuth()
+	err := config.Mongo()
+	if err != nil {
+		panic(err)
+	}
+	err = config.Redis()
+	if err != nil {
+		panic(err)
+	}
+	accountController := controllers.InitAccount(config.MongoClient)
+	roleController := controllers.InitRole(config.MongoClient)
+	authController := controllers.InitAuth(config.RedisClient, config.MongoClient)
 
 	mainGroup := router.Group("/api/v1")
 	{

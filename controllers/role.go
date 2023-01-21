@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"ima-svc-management/config"
 	"ima-svc-management/model"
 	"log"
 	"net/http"
@@ -20,11 +19,7 @@ type RoleController struct {
 	MongoClient *mongo.Client
 }
 
-func InitRole() *RoleController {
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		return nil
-	}
+func InitRole(mongoClient *mongo.Client) *RoleController {
 	return &RoleController{
 		MongoClient: mongoClient,
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"ima-svc-management/config"
 	"ima-svc-management/helpers"
 	"ima-svc-management/model"
 	"log"
@@ -21,11 +20,7 @@ type AccountController struct {
 	MongoClient *mongo.Client
 }
 
-func InitAccount() *AccountController {
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		return nil
-	}
+func InitAccount(mongoClient *mongo.Client) *AccountController {
 	return &AccountController{
 		MongoClient: mongoClient,
 	}

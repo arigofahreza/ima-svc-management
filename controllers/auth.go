@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"ima-svc-management/config"
 	"ima-svc-management/helpers"
 	"ima-svc-management/model"
 	"net/http"
@@ -22,20 +21,11 @@ type AuthController struct {
 	RedisClient *redis.Client
 }
 
-func InitAuth() *AuthController {
-	mongoClient, err := config.InitMongo().Mongo()
-	if err != nil {
-		return nil
-	}
-	redisClient, err := config.InitRedis().Redis()
-	if err != nil {
-		return nil
-	}
+func InitAuth(redisClient *redis.Client, mongoClient *mongo.Client) *AuthController {
 	return &AuthController{
 		MongoClient: mongoClient,
 		RedisClient: redisClient,
 	}
-
 }
 
 // @Summary Login
@@ -77,12 +67,12 @@ func (authController AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	refreshToken, err := helpers.GenerateToken(account.Id + ACCESS_TOKEN.String())
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		c.Abort()
-		return
-	}
+	// refreshToken, err := helpers.GenerateToken(account.Id + ACCESS_TOKEN.String())
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+	// 	c.Abort()
+	// 	return
+	// }
 
 	getToken, err := authController.RedisClient.Get(context.Background(), accessToken).Result()
 	if getToken == "" {
@@ -92,19 +82,19 @@ func (authController AuthController) Login(c *gin.Context) {
 			c.Abort()
 			return
 		}
-		setRefreshToken := authController.RedisClient.Set(context.Background(), refreshToken, "", REFRESH_TOKEN)
-		if err := setRefreshToken.Err(); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-			c.Abort()
-			return
-		}
+		// setRefreshToken := authController.RedisClient.Set(context.Background(), refreshToken, "", REFRESH_TOKEN)
+		// if err := setRefreshToken.Err(); err != nil {
+		// 	c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		// 	c.Abort()
+		// 	return
+		// }
 	} else if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
 
-	c.Header("Authorization", "Bearer " + getToken)
+	c.Header("Authorization", "Bearer "+getToken)
 
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Login Success"})
 }
