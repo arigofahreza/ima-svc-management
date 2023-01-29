@@ -1,15 +1,13 @@
 FROM golang:1.18-alpine AS builder
 WORKDIR /app
-ENV CGO_ENABLED=0
-RUN go install -v -a std
-COPY vendor ./vendor/
-RUN grep -v '#' vendor/modules.txt  | xargs -I{} sh -c "go build -mod=vendor -a -v -i {} || true"
+COPY go.* .
+RUN go mod download
 COPY . .
-RUN go build -mod=vendor -v -o ima-svc-management
+RUN go build -o server server.go
 
 
 FROM alpine:latest AS runner
 WORKDIR /app
-COPY --from=builder . ima-svc-management
+COPY --from=builder /app/ima-svc-management .
 EXPOSE 61123
 ENTRYPOINT ["./ima-svc-management"]
