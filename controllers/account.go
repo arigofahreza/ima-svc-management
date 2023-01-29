@@ -34,7 +34,6 @@ func InitAccount(mongoClient *mongo.Client) *AccountController {
 // @Produce  json
 // @Success 200 {object} object{status=string,message=string} "ok"
 // @Router /api/v1/account/add [post]
-// @Security BearerAuth
 func (accountController AccountController) AddAccount(c *gin.Context) {
 
 	collection := accountController.MongoClient.Database("test").Collection("account")
@@ -42,7 +41,7 @@ func (accountController AccountController) AddAccount(c *gin.Context) {
 	account := model.AccountModel{}
 	err := c.BindJSON(&account)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
 		c.Abort()
 		return
 	}
@@ -63,6 +62,15 @@ func (accountController AccountController) AddAccount(c *gin.Context) {
 	hash := md5.Sum(hashId)
 
 	dataAccount["_id"] = hex.EncodeToString(hash[:])
+
+	registeredAccount := model.AccountModel{}
+	filter := bson.M{"email": account.Email}
+	err = collection.FindOne(context.TODO(), filter).Decode(&registeredAccount)
+	if err == nil {
+		c.JSON(http.StatusConflict, gin.H{"message": "Email already registered"})
+		c.Abort()
+		return
+	}
 
 	_, err = collection.InsertOne(context.Background(), dataAccount)
 	if err != nil {
@@ -134,6 +142,46 @@ func (accountController AccountController) GetAccount(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
 
+}
+
+// @Summary Get account by email
+// @Description get account using email
+// @Param email query string true "email"
+// @Tags Account
+// @Accept  json
+// @Produce  json
+// @Success 200 {object} object{status=string,datas=[]model.AccountModel} "ok"
+// @Router /api/v1/account/getByEmail [get]
+// @Security BearerAuth
+func (accountController AccountController) GetAccountByEmail(c *gin.Context) {
+
+	account := model.AccountModel{}
+
+	email := c.Query("email")
+
+	collection := accountController.MongoClient.Database("test").Collection("account")
+
+	filter := bson.M{"email": email}
+
+	err := collection.FindOne(context.TODO(), filter).Decode(&account)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.Abort()
+		return
+	}
+
+	datas := make([]map[string]interface{}, 0)
+	data := map[string]interface{}{
+		"id":         account.Id,
+		"name":       account.Name,
+		"email":      account.Email,
+		"role":       account.Role,
+		"created_at": account.CreatedAt,
+		"updated_at": account.UpdatedAt,
+	}
+	datas = append(datas, data)
+
+	c.JSON(http.StatusOK, gin.H{"status": "OK", "data": datas})
 }
 
 // @Summary Get account by id
@@ -246,32 +294,4 @@ func (accountController AccountController) DeleteAccount(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Delete account successful"})
 
-}
-
-// @Summary Check email
-// @Description check email availability
-// @Param email query string true "email"
-// @Tags Account
-// @Accept  json
-// @Produce  json
-// @Success 200 {object} object{status=string,message=string} "ok"
-// @Router /api/v1/account/checkEmail [get]
-// @Security BearerAuth
-func (accountController AccountController) CheckEmail(c *gin.Context) {
-	account := model.AccountModel{}
-
-	id := c.Query("email")
-
-	collection := accountController.MongoClient.Database("test").Collection("account")
-
-	filter := bson.M{"email": id}
-
-	err := collection.FindOne(context.TODO(), filter).Decode(&account)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			c.JSON(http.StatusOK, gin.H{"status": "OK", "message": "Email Available"})
-		}
-	} else {
-		c.JSON(http.StatusForbidden, gin.H{"status": "OK", "message": "Email Not Available"})
-	}
 }

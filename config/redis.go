@@ -10,20 +10,20 @@ import (
 
 var RedisClient *redis.Client
 
-func Redis() error {
+func Redis() (*redis.Client, error) {
 	err := godotenv.Load(".env")
 	if err != nil {
-		return err
+		return nil, err
 	}
 	intPort, err := strconv.Atoi(os.Getenv("REDIS_DB"))
 	if err != nil {
-		return err
+		return nil, err
 	}
 	client := redis.NewClient(&redis.Options{
-		Addr: os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
-		DB:   intPort,
+		Addr:     os.Getenv("REDIS_HOST") + ":" + os.Getenv("REDIS_PORT"),
+		DB:       intPort,
+		Password: os.Getenv("REDIS_PASSWORD"),
 	})
-	defer client.Close()
 	RedisClient = client
-	return nil
+	return client, nil
 }

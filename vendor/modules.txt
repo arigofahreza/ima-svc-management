@@ -1,22 +1,12 @@
 # github.com/KyleBanks/depth v1.2.1
 ## explicit
 github.com/KyleBanks/depth
-# github.com/PuerkitoBio/purell v1.2.0
-## explicit; go 1.19
-# github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
-## explicit
 # github.com/cespare/xxhash/v2 v2.1.2
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/cpuguy83/go-md2man/v2 v2.0.2
-## explicit; go 1.11
 # github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
 ## explicit
 github.com/dgryski/go-rendezvous
-# github.com/ghodss/yaml v1.0.0
-## explicit
-# github.com/gin-contrib/sessions v0.0.5
-## explicit; go 1.18
 # github.com/gin-contrib/sse v0.1.0
 ## explicit; go 1.12
 github.com/gin-contrib/sse
@@ -50,8 +40,6 @@ github.com/go-playground/universal-translator
 # github.com/go-playground/validator/v10 v10.11.1
 ## explicit; go 1.13
 github.com/go-playground/validator/v10
-# github.com/go-redis/redis v6.15.9+incompatible
-## explicit
 # github.com/go-redis/redis/v8 v8.11.5
 ## explicit; go 1.17
 github.com/go-redis/redis/v8
@@ -79,12 +67,9 @@ github.com/golang-jwt/jwt/v4
 # github.com/golang/snappy v0.0.1
 ## explicit
 github.com/golang/snappy
-# github.com/gorilla/context v1.1.1
+# github.com/google/uuid v1.3.0
 ## explicit
-# github.com/gorilla/securecookie v1.1.1
-## explicit
-# github.com/gorilla/sessions v1.2.1
-## explicit
+github.com/google/uuid
 # github.com/joho/godotenv v1.4.0
 ## explicit; go 1.12
 github.com/joho/godotenv
@@ -131,10 +116,6 @@ github.com/pelletier/go-toml/v2/internal/tracker
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/russross/blackfriday/v2 v2.1.0
-## explicit
-# github.com/shurcooL/sanitized_anchor_name v1.0.0
-## explicit
 # github.com/swaggo/files v0.0.0-20220728132757-551d4a08d97a
 ## explicit; go 1.15
 github.com/swaggo/files
@@ -147,8 +128,6 @@ github.com/swaggo/swag
 # github.com/ugorji/go/codec v1.2.7
 ## explicit; go 1.11
 github.com/ugorji/go/codec
-# github.com/urfave/cli/v2 v2.23.5
-## explicit; go 1.18
 # github.com/xdg-go/pbkdf2 v1.0.0
 ## explicit; go 1.9
 github.com/xdg-go/pbkdf2
@@ -158,8 +137,6 @@ github.com/xdg-go/scram
 # github.com/xdg-go/stringprep v1.0.3
 ## explicit; go 1.11
 github.com/xdg-go/stringprep
-# github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673
-## explicit
 # github.com/youmark/pkcs8 v0.0.0-20181117223130-1be2e3e5546d
 ## explicit
 github.com/youmark/pkcs8

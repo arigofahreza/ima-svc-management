@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
 	"ima-svc-management/config"
 	"ima-svc-management/controllers"
 	docs "ima-svc-management/docs"
+	"ima-svc-management/helpers"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -23,14 +26,16 @@ func main() {
 	router.Use(gin.Logger())
 	router.Use(CORSMiddleware())
 	docs.SwaggerInfo.BasePath = "/"
-	err := config.Mongo()
+	mongoClient, err := config.Mongo()
 	if err != nil {
 		panic(err)
 	}
-	err = config.Redis()
+	defer mongoClient.Disconnect(context.TODO())
+	redisClient, err := config.Redis()
 	if err != nil {
 		panic(err)
 	}
+	defer redisClient.Close()
 	accountController := controllers.InitAccount(config.MongoClient)
 	roleController := controllers.InitRole(config.MongoClient)
 	authController := controllers.InitAuth(config.RedisClient, config.MongoClient)
@@ -40,30 +45,31 @@ func main() {
 		account := mainGroup.Group("/account")
 		{
 			account.POST("/add", accountController.AddAccount)
-			account.GET("/getById", accountController.GetAccountById)
-			account.POST("/getAll", accountController.GetAccount)
-			account.PUT("/update", accountController.UpdateAccount)
-			account.DELETE("/delete", accountController.DeleteAccount)
-			account.GET("/checkEmail", accountController.CheckEmail)
+			account.GET("/getById", AuthMiddleware(), accountController.GetAccountById)
+			account.GET("/getByEmail", AuthMiddleware(), accountController.GetAccountByEmail)
+			account.POST("/getAll", AuthMiddleware(), accountController.GetAccount)
+			account.PUT("/update", AuthMiddleware(), accountController.UpdateAccount)
+			account.DELETE("/delete", AuthMiddleware(), accountController.DeleteAccount)
 		}
 
 		role := mainGroup.Group("/role")
 		{
-			role.POST("/add", roleController.AddRole)
-			role.GET("/getById", roleController.GetRoleById)
-			role.POST("/getAll", roleController.GetRole)
-			role.PUT("/update", roleController.UpdateRole)
-			role.DELETE("/delete", roleController.DeleteRole)
+			role.POST("/add", AuthMiddleware(), roleController.AddRole)
+			role.GET("/getById", AuthMiddleware(), roleController.GetRoleById)
+			role.POST("/getAll", AuthMiddleware(), roleController.GetRole)
+			role.PUT("/update", AuthMiddleware(), roleController.UpdateRole)
+			role.DELETE("/delete", AuthMiddleware(), roleController.DeleteRole)
 		}
 
 		auth := mainGroup.Group("/auth")
 		{
 			auth.POST("/login", authController.Login)
-			auth.POST("/logout", authController.Logout)
+			auth.POST("/logout", AuthMiddleware(), authController.Logout)
+			auth.GET("/refresh", authController.Refresh)
 		}
 	}
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	router.Run(":8000")
+	router.Run(":45541")
 
 }
 
@@ -79,6 +85,23 @@ func CORSMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		c.Next()
+	}
+}
+
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		auth := helpers.Auth{}
+		err := auth.TokenValid(c)
+		if err != nil && err.Error() == "Token is expired" {
+			c.JSON(http.StatusUnauthorized, "Token is expired")
+			c.Abort()
+			return
+		} else if err != nil {
+			c.JSON(http.StatusUnauthorized, "Invalid Token")
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }

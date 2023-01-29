@@ -18,11 +18,6 @@ const docTemplate = `{
     "paths": {
         "/api/v1/account/add": {
             "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
                 "description": "create new account",
                 "consumes": [
                     "application/json"
@@ -43,58 +38,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.AccountModel"
                         }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "ok",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "type": "object"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        },
-                                        "status": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/account/checkEmail": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "check email availability",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Account"
-                ],
-                "summary": "Check email",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "email",
-                        "name": "email",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -201,6 +144,61 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/model.PaginateRoleModel"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "datas": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/model.AccountModel"
+                                            }
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/account/getByEmail": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "get account using email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account"
+                ],
+                "summary": "Get account by email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -355,18 +353,13 @@ const docTemplate = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "email",
-                        "name": "email",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "password",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "description": "body",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.LoginModel"
+                        }
                     }
                 ],
                 "responses": {
@@ -407,6 +400,44 @@ const docTemplate = `{
                     "Auth"
                 ],
                 "summary": "Logout",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "type": "object"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "status": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "get": {
+                "description": "refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh",
                 "responses": {
                     "200": {
                         "description": "ok",
@@ -729,6 +760,21 @@ const docTemplate = `{
                 },
                 "updatedAt": {
                     "type": "integer"
+                }
+            }
+        },
+        "model.LoginModel": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
                 }
             }
         },
